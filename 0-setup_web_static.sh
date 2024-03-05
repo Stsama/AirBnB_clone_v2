@@ -1,21 +1,16 @@
-#!/bin/bash
-# sets up your web servers for the deployment of web_static
-sudo apt update
-sudo apt install -y nginx
+#!/usr/bin/env bash
+# Sets up a web server for deployment of web_static.
 
-sudo mkdir -p /data/web_static/releases/test/
-sudo mkdir -p /data/web_static/shared/
+apt-get update
+apt-get install -y nginx
 
-sudo chown -R $USER:$USER /data/web_static/releases/test/
-sudo chmod -R 755 /data/web_static/releases/
+mkdir -p /data/web_static/releases/test/
+mkdir -p /data/web_static/shared/
+echo "Holberton School" > /data/web_static/releases/test/index.html
+ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-echo "alx is bae" > /data/web_static/releases/test/index.html
-
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
-
-
-sudo chown -R ubuntu /data/
-sudo chgrp -R ubuntu /data/
+chown -R ubuntu /data/
+chgrp -R ubuntu /data/
 
 printf %s "server {
     listen 80 default_server;
@@ -40,4 +35,4 @@ printf %s "server {
     }
 }" > /etc/nginx/sites-available/default
 
-sudo service nginx restart
+service nginx restart
