@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""Fabric script that generates a .tgz archive
-from the contents of the web_static
-"""
+# generates a .tgz archive from the contents of the web_static folder
 from datetime import datetime
 from fabric.api import local
 import os
@@ -17,6 +15,6 @@ def do_pack():
     path = f"versions/web_static_{ts}.tgz"
     if os.path.exists(path):
         size = os.path.getsize(path)
-        return path 
+        return path
     else:
         return None
