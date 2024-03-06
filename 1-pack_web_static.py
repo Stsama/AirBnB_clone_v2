@@ -17,6 +17,6 @@ def do_pack():
     path = f"versions/web_static_{ts}.tgz"
     if os.path.exists(path):
         size = os.path.getsize(path)
-        return f"web_static packed: {path} -> {size}bytes"
+        return path 
     else:
         return None
