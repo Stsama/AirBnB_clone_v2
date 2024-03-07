@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#  creates and distributes an archive to your web servers
+# Fabfile to create and distribute an archive to a web server.
 import os.path
 from datetime import datetime
 from fabric.api import env
@@ -7,7 +7,7 @@ from fabric.api import local
 from fabric.api import put
 from fabric.api import run
 
-env.hosts = ["52.91.202.237", "34.224.16.163"]
+env.hosts = ["104.196.168.90", "35.196.46.172"]
 
 
 def do_pack():
@@ -67,10 +67,10 @@ def do_deploy(archive_path):
         return False
     return True
 
+
 def deploy():
-    """
-    """
-    file_path = do_pack()
-    if file_path is None:
+    """Create and distribute an archive to a web server."""
+    file = do_pack()
+    if file is None:
         return False
-    return do_deploy(file_path)
+    return do_deploy(file)
