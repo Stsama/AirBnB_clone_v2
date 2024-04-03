@@ -3,13 +3,14 @@
 import cmd
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
+from models import storage
 from models.user import User
 from models.place import Place
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from os import getenv
 
 
 class HBNBCommand(cmd.Cmd):
@@ -119,22 +120,32 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif clsName not in HBNBCommand.classes:
+        elif clsName not in self.classes:
             print("** class doesn't exist **")
             return
             
         params = {}
         import json
-        
-        for a in args.split()[1:]:
-            arg = a.split("=")
-            params[ arg[0] ] = json.loads(arg[1].replace("_"," "))
-        print(params)
-        
-        new_instance = HBNBCommand.classes[clsName]()
+        my_args = args.split(" ")[1:]
+        for i in range(len(my_args)):
+            #arg = a.split("=")
+            #params[ arg[0] ] = json.loads(arg[1].replace("_"," "))
+            key, value = tuple(my_args[i].split("="))
+            if value[0] == '"':
+                value = value.strip('"').replace("_", " ")
+            else:
+                try:
+                    value = eval(value)
+                except:
+                    continue
+            params[key] = value
+        if params == {}:
+            new_instance = self.classes[clsName]()
+        else:
+            new_instance = self.classes[clsName](**params)
+        storage.new(new_instance)
         storage.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -155,7 +166,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
 
-        if c_name not in HBNBCommand.classes:
+        if c_name not in self.classes:
             print("** class doesn't exist **")
             return
 
@@ -209,21 +220,17 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
-        print_list = []
-
+        if not args:
+            o = storage.all()
+            print([o[k].__str__() for k in o])
+            return
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+            line = args.split(" ")
+            if line[0] not in HBNBCommand.classes:
                 print("** class doesn't exist **")
-                return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
-        print(print_list)
+            else:    
+                o = storage.all(eval(line[0]))
+                print([o[k].__str__() for k in o])
 
     def help_all(self):
         """ Help information for the all command """
@@ -233,7 +240,8 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, args):
         """Count current number of class instances"""
         count = 0
-        for k, v in storage._FileStorage__objects.items():
+        objects = storage.all()
+        for k, v in objects.items():
             if args == k.split('.')[0]:
                 count += 1
         print(count)
